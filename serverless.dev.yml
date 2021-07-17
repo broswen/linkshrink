@@ -1,0 +1,6 @@
+vpcId: vpc for rds and lambda
+subnetIds:
+  - ids for lambda and postgres
+routeTableIds:
+  - ids for vpc interface endpoint
+postgresSecretArn: arn to get postgres creds

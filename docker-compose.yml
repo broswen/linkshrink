@@ -1,0 +1,15 @@
+version: '3.1'
+
+# connect with 
+# host: localhost
+# port: 5432
+# user: postgres
+# password: password
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+    ports: 
+      - "5432:5432"

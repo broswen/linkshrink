@@ -1,0 +1,3 @@
+Resources:
+  ReportsBucket:
+    Type: AWS::S3::Bucket

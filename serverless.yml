@@ -1,0 +1,59 @@
+service: linkshrink
+
+frameworkVersion: "2"
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+
+provider:
+  name: aws
+  region: us-east-1
+
+  stage: ${opt:stage, 'dev'}
+
+  runtime: nodejs12.x
+  memorySize: 128
+  timeout: 3
+
+  lambdaHashingVersion: "20201221"
+
+functions:
+  CreateLink:
+    handler: src/lambdas/createlink/CreateLink.handler
+    events:
+      - http:
+          path: /shrink
+          method: post
+  GetLink:
+    handler: src/lambdas/getlink/GetLink.handler
+    events:
+      - http:
+          path: /{slug}
+          method: get
+  GetLinkInfo:
+    handler: src/lambdas/getlinkinfo/GetLinkInfo.handler
+    events:
+      - http:
+          path: /link/{slug}
+          method: get
+  GetLinkStats:
+    handler: src/lambdas/getlinkstats/GetLinkStats.handler
+    events:
+      - http:
+          path: /link/{slug}/stats
+          method: post
+  CreateLinkReport:
+    handler: src/lambdas/createlinkreport/CreateLinkReport.handler
+    events:
+      - http:
+          path: /link/{slug}/report
+          method: post
+
+resources:
+  - ${file(./cfn-resources/s3-resources.yml)}
+  - ${file(./cfn-resources/iam-resources.yml)}
+  - ${file(./cfn-resources/dynamodb-resources.yml)}
+  - ${file(./cfn-resources/kinesis-resources.yml)}
+  - ${file(./cfn-resources/rds-resources.yml)}
+  - ${file(./cfn-resources/vpc-resources.yml)}

@@ -1,0 +1,37 @@
+{
+  "name": "linkshrink",
+  "version": "1.0.0",
+  "description": "<!-- title: 'AWS Simple HTTP Endpoint example in NodeJS' description: 'This template demonstrates how to make a simple REST API with Node.js running on AWS Lambda and API Gateway using the traditional Serverless Framework.' layout: Doc framework: v2 platform: AWS language: nodeJS authorLink: 'https://github.com/serverless' authorName: 'Serverless, inc.' authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4' -->",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.28.3",
+    "@typescript-eslint/parser": "^4.28.3",
+    "eslint": "^7.30.0",
+    "serverless-offline": "^7.0.0",
+    "serverless-plugin-typescript": "^1.1.9",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.21.0",
+    "@aws-sdk/client-kinesis": "^3.21.0",
+    "@aws-sdk/client-s3": "^3.21.0",
+    "@aws-sdk/types": "^3.20.0",
+    "@middy/core": "^2.4.3",
+    "@middy/http-error-handler": "^2.4.3",
+    "@middy/http-json-body-parser": "^2.4.3",
+    "@middy/validator": "^2.4.3",
+    "@types/aws-lambda": "^8.10.79",
+    "http-errors": "^1.8.0",
+    "ksuid": "^2.0.0",
+    "pg": "^8.6.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.6.5",
+    "winston": "^3.2.1"
+  }
+}
