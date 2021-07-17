@@ -1,1 +1,22 @@
 Resources:
+  LinksTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: slug
+          AttributeType: S
+        - AttributeName: key
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: keyindex
+          KeySchema:
+            - AttributeName: key
+              KeyType: HASH
+            - AttributeName: slug
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      KeySchema:
+        - AttributeName: slug
+          KeyType: HASH

@@ -20,35 +20,42 @@ provider:
 
 functions:
   CreateLink:
-    handler: src/lambdas/createlink/CreateLink.handler
+    handler: src/lambdas/CreateLink.handler
     events:
       - http:
           path: /shrink
           method: post
   GetLink:
-    handler: src/lambdas/getlink/GetLink.handler
+    handler: src/lambdas/GetLink.handler
     events:
       - http:
           path: /{slug}
           method: get
   GetLinkInfo:
-    handler: src/lambdas/getlinkinfo/GetLinkInfo.handler
+    handler: src/lambdas/GetLinkInfo.handler
     events:
       - http:
           path: /link/{slug}
           method: get
   GetLinkStats:
-    handler: src/lambdas/getlinkstats/GetLinkStats.handler
+    handler: src/lambdas/GetLinkStats.handler
     events:
       - http:
           path: /link/{slug}/stats
           method: post
   CreateLinkReport:
-    handler: src/lambdas/createlinkreport/CreateLinkReport.handler
+    handler: src/lambdas/CreateLinkReport.handler
     events:
       - http:
           path: /link/{slug}/report
           method: post
+
+  IngestClickEvents:
+    handler: src/lambdas/IngestClickEvents.handler
+    events:
+      - stream:
+          type: kinesis
+          arn: !GetAtt ClickEventsStream.Arn
 
 resources:
   - ${file(./cfn-resources/s3-resources.yml)}
