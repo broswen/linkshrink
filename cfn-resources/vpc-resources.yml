@@ -10,11 +10,18 @@ Resources:
           ToPort: 65535
           IpProtocol: "-1"
 
-  LambdaSecurityGroupEgress:
+  LambdaSecurityGroupEgressPostgres:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
       GroupId: !GetAtt LambdaSecurityGroup.GroupId
       DestinationSecurityGroupId: !Ref PostgresSecurityGroup
+      IpProtocol: "-1"
+
+  LambdaSecurityGroupEgressVPCE:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !GetAtt LambdaSecurityGroup.GroupId
+      DestinationSecurityGroupId: !GetAtt VpcEndpointSecurityGroup.GroupId
       IpProtocol: "-1"
 
   PostgresSecurityGroup:
@@ -25,3 +32,25 @@ Resources:
       SecurityGroupIngress:
         - SourceSecurityGroupId: !Ref LambdaSecurityGroup
           IpProtocol: "-1"
+
+  SecretsManagerEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: com.amazonaws.us-east-1.secretsmanager
+      VpcId: ${file(serverless.${self:provider.stage}.yml):vpc}
+      VpcEndpointType: Interface
+      SubnetIds: ${file(serverless.${self:provider.stage}.yml):subnets}
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !GetAtt VpcEndpointSecurityGroup.GroupId
+
+  VpcEndpointSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      VpcId: ${file(serverless.${self:provider.stage}.yml):vpc}
+      GroupDescription: "Security group for VPC Endpoint"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !GetAtt LambdaSecurityGroup.GroupId

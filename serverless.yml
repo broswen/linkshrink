@@ -12,11 +12,49 @@ provider:
 
   stage: ${opt:stage, 'dev'}
 
+  apiGateway:
+    apiKeys:
+      - linkshrink-test
+    usagePlan:
+      throttle:
+        burstLimit: 5
+        rateLimit: 1
+
   runtime: nodejs12.x
   memorySize: 128
   timeout: 3
 
   lambdaHashingVersion: "20201221"
+
+  iamRoleStatements:
+    # - Effect: Allow
+    #   Action:
+    #     - s3:GetObject
+    #     - s3:PutObject
+    #   Resource:
+    #     - !GetAtt ReportsBucket.Arn
+    #     - !Join ["/", [!GetAtt ReportsBucket.Arn, "*"]]
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:Query
+        - dynamodb:UpdateItem
+      Resource: !GetAtt LinksTable.Arn
+    - Effect: Allow
+      Action:
+        - kinesis:PutRecord
+        - kinesis:PutRecords
+      Resource: !GetAtt ClickEventsStream.Arn
+    - Effect: Allow
+      Action: secretsmanager:GetSecretValue
+      Resource: ${file(serverless.${self:provider.stage}.yml):postgresSecretArn}
+
+  environment:
+    DBSECRET: ${file(serverless.${self:provider.stage}.yml):postgresSecretArn}
+    STAGE: ${self:provider.stage}
+    LINKSTABLE: !Ref LinksTable
+    CLICKEVENTSSTREAM: !Ref ClickEventsStream
 
 functions:
   CreateLink:
@@ -25,6 +63,7 @@ functions:
       - http:
           path: /shrink
           method: post
+          private: true
   GetLink:
     handler: src/lambdas/GetLink.handler
     events:
@@ -37,18 +76,24 @@ functions:
       - http:
           path: /link/{slug}
           method: get
+          private: true
   GetLinkStats:
     handler: src/lambdas/GetLinkStats.handler
     events:
       - http:
           path: /link/{slug}/stats
-          method: post
-  CreateLinkReport:
-    handler: src/lambdas/CreateLinkReport.handler
-    events:
-      - http:
-          path: /link/{slug}/report
-          method: post
+          method: get
+          private: true
+    vpc:
+      subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
+      securityGroupIds:
+        - !Ref LambdaSecurityGroup
+  # CreateLinkReport:
+  #   handler: src/lambdas/CreateLinkReport.handler
+  #   events:
+  #     - http:
+  #         path: /link/{slug}/report
+  #         method: post
 
   IngestClickEvents:
     handler: src/lambdas/IngestClickEvents.handler
@@ -56,6 +101,10 @@ functions:
       - stream:
           type: kinesis
           arn: !GetAtt ClickEventsStream.Arn
+    vpc:
+      subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
+      securityGroupIds:
+        - !Ref LambdaSecurityGroup
 
 resources:
   - ${file(./cfn-resources/s3-resources.yml)}

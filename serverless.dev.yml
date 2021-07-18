@@ -1,6 +1,8 @@
-vpcId: vpc for rds and lambda
-subnetIds:
-  - ids for lambda and postgres
-routeTableIds:
-  - ids for vpc interface endpoint
-postgresSecretArn: arn to get postgres creds
+vpc: vpc-c414f1b9
+subnets:
+  - subnet-9b1acdba
+  - subnet-b29c54d4
+  - subnet-becb1ee1
+routeTables:
+  - rtb-b2f292cc
+postgresSecretArn: arn:aws:secretsmanager:us-east-1:338666141871:secret:slstspg/dev/secret-bWt23f
