@@ -5,6 +5,7 @@ frameworkVersion: "2"
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
+  - serverless-step-functions
 
 provider:
   name: aws

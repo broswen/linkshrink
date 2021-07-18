@@ -20,3 +20,18 @@ Resources:
       KeySchema:
         - AttributeName: slug
           KeyType: HASH
+
+  ReportsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: key
+          AttributeType: S
+        - AttributeName: reportkey
+          AttributeType: S
+      KeySchema:
+        - AttributeName: key
+          KeyType: HASH
+        - AttributeName: reportkey
+          KeyType: RANGE
