@@ -57,7 +57,7 @@ The full link will look like `https://test.com/1vVGu3wpWWRiUZhXWJT7tElmzNw`
 This will return a key which is where the generated report will be stored in S3.
 ```json
 {
-    "key": "1vVGu3wpWWRiUZhXWJT7tElmzNw-2021-07-22T20:54:00.000Z.csv"
+    "key": "1vVGu3wpWWRiUZhXWJT7tElmzNw/2021-07-22T20:54:00.000Z.csv"
 }
 ```
 
