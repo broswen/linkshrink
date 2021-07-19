@@ -29,6 +29,7 @@
     "@middy/http-json-body-parser": "^2.4.3",
     "@middy/validator": "^2.4.3",
     "@types/aws-lambda": "^8.10.79",
+    "csv-parse": "^4.16.0",
     "http-errors": "^1.8.0",
     "ksuid": "^2.0.0",
     "pg": "^8.6.0",

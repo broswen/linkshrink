@@ -107,6 +107,27 @@ functions:
       securityGroupIds:
         - !Ref LambdaSecurityGroup
 
+  StartReport:
+    handler: src/lambdas/report/StartReport.handler
+    vpc:
+      subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
+      securityGroupIds:
+        - !Ref LambdaSecurityGroup
+
+  GenerateReport:
+    handler: src/lambdas/report/GenerateReport.handler
+    vpc:
+      subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
+      securityGroupIds:
+        - !Ref LambdaSecurityGroup
+
+  StopReport:
+    handler: src/lambdas/report/GenerateReport.handler
+    vpc:
+      subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
+      securityGroupIds:
+        - !Ref LambdaSecurityGroup
+
 resources:
   - ${file(./cfn-resources/s3-resources.yml)}
   - ${file(./cfn-resources/iam-resources.yml)}
