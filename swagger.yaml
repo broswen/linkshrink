@@ -217,12 +217,14 @@ definitions:
     properties:
       link:
         type: "string"
+        required: true
       clicks:
         type: "boolean"
-        default: true
+        required: true
       expires:
         type: "string"
         format: "date-time"
+        required: true
   CreateLinkResponse:
     type: "object"
     properties:
@@ -260,9 +262,11 @@ definitions:
       start:
         type: string
         format: date-time
+        required: true
       stop:
         type: string
         format: date-time
+        required: true
   CreateLinkReportResponse:
     type: "object"
     properties:
