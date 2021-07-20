@@ -39,7 +39,7 @@ const schema = {
       type: 'object',
       properties: {
         link: { type: 'string' },
-        expires: { type: 'string' },
+        expires: { type: 'string', format: 'date-time' },
         clicks: { type: 'boolean' }
       },
       required: ['link', 'expires', 'clicks']

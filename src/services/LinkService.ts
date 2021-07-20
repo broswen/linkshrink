@@ -2,6 +2,7 @@
 
 import { DynamoDBClient, GetItemCommand, GetItemCommandInput, GetItemCommandOutput, PutItemCommand, PutItemCommandInput, PutItemCommandOutput } from '@aws-sdk/client-dynamodb'
 import { Link } from '../models/Link'
+import { LinkReport } from '../models/LinkReport'
 
 const KSUID = require('ksuid')
 
@@ -82,5 +83,65 @@ export default class LinkService {
 
         return createdLink
 
+    }
+
+    async createLinkReport(slug: string, start: Date, stop: Date): Promise<string> {
+        let key: string = (await KSUID.random()).string;
+        let reportKey: string = `${key}-${new Date().toISOString()}`
+
+        const putItemInput: PutItemCommandInput = {
+            TableName: process.env.REPORTSTABLE,
+            Item: {
+                slug: {
+                    S: slug
+                },
+                reportkey: {
+                    S: reportKey
+                },
+                start: {
+                    S: start.toISOString()
+                },
+                stop: {
+                    S: stop.toISOString()
+                },
+                status: {
+                    S: 'PROCESSING'
+                }
+            },
+            ConditionExpression: 'attribute_not_exists(reportkey)'
+        }
+
+        let putItemResponse: PutItemCommandOutput = await this.ddbClient.send(new PutItemCommand(putItemInput))
+
+
+        return reportKey
+    }
+
+    async getLinkReport(slug: string, reportKey: string): Promise<LinkReport> {
+        const getItemInput: GetItemCommandInput = {
+            TableName: process.env.REPORTSTABLE,
+            Key: {
+                slug: {
+                    S: slug
+                },
+                reportkey: {
+                    S: reportKey
+                }
+            }
+        }
+
+        let getItemResponse: GetItemCommandOutput = await this.ddbClient.send(new GetItemCommand(getItemInput))
+
+        if (getItemResponse.Item == undefined) {
+            throw new Error(`report not found for ${reportKey}`)
+        }
+
+        return {
+            slug: getItemResponse.Item.slug.S,
+            reportKey: getItemResponse.Item.reportkey.S,
+            status: getItemResponse.Item.status.S,
+            start: new Date(getItemResponse.Item.start.S),
+            stop: new Date(getItemResponse.Item.stop.S)
+        }
     }
 }

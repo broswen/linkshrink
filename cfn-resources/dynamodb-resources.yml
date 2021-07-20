@@ -26,12 +26,12 @@ Resources:
     Properties:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: key
+        - AttributeName: slug
           AttributeType: S
         - AttributeName: reportkey
           AttributeType: S
       KeySchema:
-        - AttributeName: key
+        - AttributeName: slug
           KeyType: HASH
         - AttributeName: reportkey
           KeyType: RANGE

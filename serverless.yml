@@ -41,7 +41,9 @@ provider:
         - dynamodb:GetItem
         - dynamodb:Query
         - dynamodb:UpdateItem
-      Resource: !GetAtt LinksTable.Arn
+      Resource:
+        - !GetAtt LinksTable.Arn
+        - !GetAtt ReportsTable.Arn
     - Effect: Allow
       Action:
         - kinesis:PutRecord
@@ -55,6 +57,7 @@ provider:
     DBSECRET: ${file(serverless.${self:provider.stage}.yml):postgresSecretArn}
     STAGE: ${self:provider.stage}
     LINKSTABLE: !Ref LinksTable
+    REPORTSTABLE: !Ref ReportsTable
     CLICKEVENTSSTREAM: !Ref ClickEventsStream
 
 functions:
@@ -89,12 +92,20 @@ functions:
       subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
       securityGroupIds:
         - !Ref LambdaSecurityGroup
-  # CreateLinkReport:
-  #   handler: src/lambdas/CreateLinkReport.handler
-  #   events:
-  #     - http:
-  #         path: /link/{slug}/report
-  #         method: post
+
+  CreateLinkReport:
+    handler: src/lambdas/CreateLinkReport.handler
+    events:
+      - http:
+          path: /link/{slug}/report
+          method: post
+
+  GetLinkReport:
+    handler: src/lambdas/GetLinkReport.handler
+    events:
+      - http:
+          path: /link/{slug}/report/{reportkey}
+          method: get
 
   IngestClickEvents:
     handler: src/lambdas/IngestClickEvents.handler

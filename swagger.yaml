@@ -272,14 +272,14 @@ definitions:
     properties:
       key:
         type: string
-      reportkey:
+      reportKey:
         type: string
   GetLinkReportStatusResponse:
     type: "object"
     properties:
       key:
         type: string
-      reportkey:
+      reportKey:
         type: string
       slug:
         type: string
