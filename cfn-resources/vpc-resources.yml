@@ -1,4 +1,5 @@
 Resources:
+  # TODO add dynamodb gateway endpoint prefix list for egress
   LambdaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -24,6 +25,13 @@ Resources:
       DestinationSecurityGroupId: !GetAtt VpcEndpointSecurityGroup.GroupId
       IpProtocol: "-1"
 
+  LambdaSecurityGroupEgressDDB:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !GetAtt LambdaSecurityGroup.GroupId
+      DestinationSecurityGroupId: !GetAtt VpcEndpointSecurityGroup.GroupId
+      IpProtocol: "-1"
+
   PostgresSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -43,6 +51,14 @@ Resources:
       PrivateDnsEnabled: true
       SecurityGroupIds:
         - !GetAtt VpcEndpointSecurityGroup.GroupId
+
+  DynamoDBEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: com.amazonaws.us-east-1.dynamodb
+      VpcId: ${file(serverless.${self:provider.stage}.yml):vpc}
+      VpcEndpointType: Gateway
+      RouteTableIds: ${file(serverless.${self:provider.stage}.yml):routeTables}
 
   VpcEndpointSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"

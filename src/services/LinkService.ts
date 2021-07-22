@@ -1,6 +1,6 @@
 'use strict'
 
-import { DynamoDBClient, GetItemCommand, GetItemCommandInput, GetItemCommandOutput, PutItemCommand, PutItemCommandInput, PutItemCommandOutput } from '@aws-sdk/client-dynamodb'
+import { DynamoDBClient, GetItemCommand, GetItemCommandInput, GetItemCommandOutput, PutItemCommand, PutItemCommandInput, PutItemCommandOutput, UpdateItemCommand, UpdateItemCommandInput, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb'
 import { Link } from '../models/Link'
 import { LinkReport } from '../models/LinkReport'
 
@@ -144,4 +144,32 @@ export default class LinkService {
             stop: new Date(getItemResponse.Item.stop.S)
         }
     }
+
+    async setLinkReportStatus(slug: string, reportKey: string, status: string) {
+        const updateItemInput: UpdateItemCommandInput = {
+            TableName: process.env.REPORTSTABLE,
+            Key: {
+                slug: {
+                    S: slug
+                },
+                reportkey: {
+                    S: reportKey
+                }
+            },
+            UpdateExpression: 'SET #s = :s',
+            ExpressionAttributeNames: {
+                '#s': 'status'
+            },
+            ExpressionAttributeValues: {
+                ':s': {
+                    S: status
+                }
+            }
+        }
+
+        let updateItemResponse: UpdateItemCommandOutput = await this.ddbClient.send(new UpdateItemCommand(updateItemInput))
+
+        return
+    }
+
 }

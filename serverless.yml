@@ -27,32 +27,6 @@ provider:
 
   lambdaHashingVersion: "20201221"
 
-  iamRoleStatements:
-    # - Effect: Allow
-    #   Action:
-    #     - s3:GetObject
-    #     - s3:PutObject
-    #   Resource:
-    #     - !GetAtt ReportsBucket.Arn
-    #     - !Join ["/", [!GetAtt ReportsBucket.Arn, "*"]]
-    - Effect: Allow
-      Action:
-        - dynamodb:PutItem
-        - dynamodb:GetItem
-        - dynamodb:Query
-        - dynamodb:UpdateItem
-      Resource:
-        - !GetAtt LinksTable.Arn
-        - !GetAtt ReportsTable.Arn
-    - Effect: Allow
-      Action:
-        - kinesis:PutRecord
-        - kinesis:PutRecords
-      Resource: !GetAtt ClickEventsStream.Arn
-    - Effect: Allow
-      Action: secretsmanager:GetSecretValue
-      Resource: ${file(serverless.${self:provider.stage}.yml):postgresSecretArn}
-
   environment:
     DBSECRET: ${file(serverless.${self:provider.stage}.yml):postgresSecretArn}
     STAGE: ${self:provider.stage}
@@ -63,6 +37,7 @@ provider:
 functions:
   CreateLink:
     handler: src/lambdas/CreateLink.handler
+    role: !GetAtt RestApiRole.Arn
     events:
       - http:
           path: /link
@@ -70,12 +45,14 @@ functions:
           private: true
   GetLink:
     handler: src/lambdas/GetLink.handler
+    role: !GetAtt RestApiRole.Arn
     events:
       - http:
           path: /{slug}
           method: get
   GetLinkInfo:
     handler: src/lambdas/GetLinkInfo.handler
+    role: !GetAtt RestApiRole.Arn
     events:
       - http:
           path: /link/{slug}
@@ -83,6 +60,7 @@ functions:
           private: true
   GetLinkStats:
     handler: src/lambdas/GetLinkStats.handler
+    role: !GetAtt RestApiVpcRole.Arn
     events:
       - http:
           path: /link/{slug}/stats
@@ -95,6 +73,9 @@ functions:
 
   CreateLinkReport:
     handler: src/lambdas/CreateLinkReport.handler
+    role: !GetAtt RestApiRole.Arn
+    environment:
+      GENERATEREPORTSM: !Ref GenerateReportStateMachine
     events:
       - http:
           path: /link/{slug}/report
@@ -102,6 +83,7 @@ functions:
 
   GetLinkReport:
     handler: src/lambdas/GetLinkReport.handler
+    role: !GetAtt RestApiRole.Arn
     events:
       - http:
           path: /link/{slug}/report/{reportkey}
@@ -109,6 +91,7 @@ functions:
 
   IngestClickEvents:
     handler: src/lambdas/IngestClickEvents.handler
+    role: !GetAtt RestApiVpcRole.Arn
     events:
       - stream:
           type: kinesis
@@ -118,24 +101,44 @@ functions:
       securityGroupIds:
         - !Ref LambdaSecurityGroup
 
-  # StartReport:
-  #   handler: src/lambdas/report/StartReport.handler
-  #   vpc:
-  #     subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
-  #     securityGroupIds:
-  #       - !Ref LambdaSecurityGroup
-  # GenerateReport:
-  #   handler: src/lambdas/report/GenerateReport.handler
-  #   vpc:
-  #     subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
-  #     securityGroupIds:
-  #       - !Ref LambdaSecurityGroup
-  # StopReport:
-  #   handler: src/lambdas/report/GenerateReport.handler
-  #   vpc:
-  #     subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
-  #     securityGroupIds:
-  #       - !Ref LambdaSecurityGroup
+  StartReport:
+    handler: src/lambdas/report/StartReport.handler
+    role: !GetAtt ReportWorkflowRole.Arn
+
+  GenerateReport:
+    handler: src/lambdas/report/GenerateReport.handler
+    role: !GetAtt ReportWorkflowRole.Arn
+    vpc:
+      subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
+      securityGroupIds:
+        - !Ref LambdaSecurityGroup
+
+  StopReport:
+    handler: src/lambdas/report/StopReport.handler
+    role: !GetAtt ReportWorkflowRole.Arn
+
+stepFunctions:
+  stateMachines:
+    generateReportStateMachine:
+      id: GenerateReportStateMachine
+      definition:
+        StartAt: startReport
+        States:
+          startReport:
+            Type: Task
+            Resource: !GetAtt StartReport.Arn
+            ResultPath: $.start
+            Next: generateReport
+          generateReport:
+            Type: Task
+            Resource: !GetAtt GenerateReport.Arn
+            ResultPath: $.generate
+            Next: stopReport
+          stopReport:
+            Type: Task
+            Resource: !GetAtt StopReport.Arn
+            ResultPath: $.end
+            End: true
 
 resources:
   - ${file(./cfn-resources/s3-resources.yml)}
