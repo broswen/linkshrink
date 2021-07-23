@@ -67,3 +67,4 @@ resources:
   - ${file(./cfn-resources/iam-resources.yml)}
   - ${file(./cfn-resources/dynamodb-resources.yml)}
   - ${file(./cfn-resources/kinesis-resources.yml)}
+  - ${file(./cfn-resources/glue-resources.yml)}

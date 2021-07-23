@@ -1,0 +1,26 @@
+Resources:
+  LinkShrinkDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Description: Database for LinkShrink
+
+  ClickEventsCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Role: !GetAtt ClickEventsCrawlerRole.Arn
+      DatabaseName: !Ref LinkShrinkDatabase
+      Targets:
+        S3Targets:
+          - Path: !Join ["", ["s3://", !Ref ClickEventsBucket]]
+            Exclusions:
+              - processing-failed/**
+
+  ClickEventsTable:
+    Type: AWS::Glue::Table
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseName: !Ref LinkShrinkDatabase
+      TableInput:
+        Description: ClickEvents table for s3
