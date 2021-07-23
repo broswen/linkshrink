@@ -35,33 +35,8 @@ The full link will look like `https://test.com/1vVGu3wpWWRiUZhXWJT7tElmzNw`
 }
 ```
 
-3. Send a GET request to `test.com/link/1vVGu3wpWWRiUZhXWJT7tElmzNw/stats` to get statistics about the link. Currently this endpoint only returns the total clicks.
-
-```json
-{
-    "slug": "1vVGu3wpWWRiUZhXWJT7tElmzNw",
-    "count": 4
-}
-```
-
-### In-Progress
-4. Send a POST request to `test.com/link/1vVGu3wpWWRiUZhXWJT7tElmzNw/report` to start a workflow to generate a report of all click event activity for a specified time period.
-
-```json
-{
-    "start": "2021-07-22T19:30:00.000Z",
-    "end": "2021-07-22T20:54:00.000Z"
-}
-```
-
-This will return a key which is where the generated report will be stored in S3.
-```json
-{
-    "key": "1vVGu3wpWWRiUZhXWJT7tElmzNw/2021-07-22T20:54:00.000Z.csv"
-}
-```
-
 ### TODO List
 - [ ] use typed errors
-- [ ] create endpoint to trigger report workflow
-- [ ] create endpoint to download report from s3
+- [ ] create glue crawler
+- [ ] create glue table/database
+- [ ] use athena to create monthly reports
