@@ -5,4 +5,3 @@ subnets:
   - subnet-becb1ee1
 routeTables:
   - rtb-b2f292cc
-postgresSecretArn: arn:aws:secretsmanager:us-east-1:338666141871:secret:slstspg/dev/secret-bWt23f

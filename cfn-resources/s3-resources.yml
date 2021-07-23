@@ -1,3 +1,5 @@
 Resources:
   ReportsBucket:
     Type: AWS::S3::Bucket
+  ClickEventsBucket:
+    Type: AWS::S3::Bucket

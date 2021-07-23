@@ -44,6 +44,8 @@ async function generateReport(event: LinkReportEvent) {
 
   logger.info(`generating report for ${event.slug} ${event.reportKey}`)
 
+  // TODO convert click event objects into csv data and save to s3 with reportKey
+
 }
 
 const schema = {

@@ -5,7 +5,6 @@ frameworkVersion: "2"
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
-  - serverless-step-functions
 
 provider:
   name: aws
@@ -28,7 +27,6 @@ provider:
   lambdaHashingVersion: "20201221"
 
   environment:
-    DBSECRET: ${file(serverless.${self:provider.stage}.yml):postgresSecretArn}
     STAGE: ${self:provider.stage}
     LINKSTABLE: !Ref LinksTable
     REPORTSTABLE: !Ref ReportsTable
@@ -58,92 +56,14 @@ functions:
           path: /link/{slug}
           method: get
           private: true
-  GetLinkStats:
-    handler: src/lambdas/GetLinkStats.handler
-    role: !GetAtt RestApiVpcRole.Arn
-    events:
-      - http:
-          path: /link/{slug}/stats
-          method: get
-          private: true
-    vpc:
-      subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
-      securityGroupIds:
-        - !Ref LambdaSecurityGroup
 
-  CreateLinkReport:
-    handler: src/lambdas/CreateLinkReport.handler
-    role: !GetAtt RestApiRole.Arn
-    environment:
-      GENERATEREPORTSM: !Ref GenerateReportStateMachine
-    events:
-      - http:
-          path: /link/{slug}/report
-          method: post
-
-  GetLinkReport:
-    handler: src/lambdas/GetLinkReport.handler
-    role: !GetAtt RestApiRole.Arn
-    events:
-      - http:
-          path: /link/{slug}/report/{reportkey}
-          method: get
-
-  IngestClickEvents:
-    handler: src/lambdas/IngestClickEvents.handler
-    role: !GetAtt RestApiVpcRole.Arn
-    events:
-      - stream:
-          type: kinesis
-          arn: !GetAtt ClickEventsStream.Arn
-    vpc:
-      subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
-      securityGroupIds:
-        - !Ref LambdaSecurityGroup
-
-  StartReport:
-    handler: src/lambdas/report/StartReport.handler
-    role: !GetAtt ReportWorkflowRole.Arn
-
-  GenerateReport:
-    handler: src/lambdas/report/GenerateReport.handler
-    role: !GetAtt ReportWorkflowRole.Arn
-    vpc:
-      subnetIds: ${file(./serverless.${self:provider.stage}.yml):subnets}
-      securityGroupIds:
-        - !Ref LambdaSecurityGroup
-
-  StopReport:
-    handler: src/lambdas/report/StopReport.handler
-    role: !GetAtt ReportWorkflowRole.Arn
-
-stepFunctions:
-  stateMachines:
-    generateReportStateMachine:
-      id: GenerateReportStateMachine
-      definition:
-        StartAt: startReport
-        States:
-          startReport:
-            Type: Task
-            Resource: !GetAtt StartReport.Arn
-            ResultPath: $.start
-            Next: generateReport
-          generateReport:
-            Type: Task
-            Resource: !GetAtt GenerateReport.Arn
-            ResultPath: $.generate
-            Next: stopReport
-          stopReport:
-            Type: Task
-            Resource: !GetAtt StopReport.Arn
-            ResultPath: $.end
-            End: true
+  DeliveryStreamProcessor:
+    handler: src/lambdas/DeliveryStreamProcessor.handler
+    role: !GetAtt DeliveryStreamProcessorRole.Arn
+    timeout: 60
 
 resources:
   - ${file(./cfn-resources/s3-resources.yml)}
   - ${file(./cfn-resources/iam-resources.yml)}
   - ${file(./cfn-resources/dynamodb-resources.yml)}
   - ${file(./cfn-resources/kinesis-resources.yml)}
-  - ${file(./cfn-resources/rds-resources.yml)}
-  - ${file(./cfn-resources/vpc-resources.yml)}
