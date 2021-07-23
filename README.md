@@ -5,7 +5,7 @@
 
 ### Usage
 
-1. Send POST request with details to create a link. `clicks` defines if click events should be saved for analytics. `expires` defines when the link will return 404s and no longer redirect.
+1. Send POST request to `test.com/shrink` with details to create a link. `clicks` defines if click events should be saved for analytics. `expires` defines when the link will return 404s and no longer redirect.
 
 ```json
 {
@@ -21,7 +21,7 @@ The response will list the slug (unique id) of the link.
     "slug": "1vVGu3wpWWRiUZhXWJT7tElmzNw"
 }
 ```
-The full link will look like `https://test.com/1vVGu3wpWWRiUZhXWJT7tElmzNw`
+The full link will look like `https://test.com/1vVGu3wpWWRiUZhXWJT7tElmzNw`. This is what end users should click for redirection/analytics.
 
 2. Send a GET request to `test.com/link/1vVGu3wpWWRiUZhXWJT7tElmzNw` to get metadata about the link. `key` is the api key id used to create the link.
 ```json
