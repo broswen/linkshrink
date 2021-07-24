@@ -31,6 +31,7 @@ provider:
     LINKSTABLE: !Ref LinksTable
     REPORTSTABLE: !Ref ReportsTable
     CLICKEVENTSSTREAM: !Ref ClickEventsStream
+    GLUEDB: !Ref LinkShrinkDatabase
 
 functions:
   CreateLink:

@@ -1,7 +1,0 @@
-vpc: vpc-c414f1b9
-subnets:
-  - subnet-9b1acdba
-  - subnet-b29c54d4
-  - subnet-becb1ee1
-routeTables:
-  - rtb-b2f292cc

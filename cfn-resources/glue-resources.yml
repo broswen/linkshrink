@@ -16,11 +16,3 @@ Resources:
           - Path: !Join ["", ["s3://", !Ref ClickEventsBucket]]
             Exclusions:
               - processing-failed/**
-
-  ClickEventsTable:
-    Type: AWS::Glue::Table
-    Properties:
-      CatalogId: !Ref AWS::AccountId
-      DatabaseName: !Ref LinkShrinkDatabase
-      TableInput:
-        Description: ClickEvents table for s3
