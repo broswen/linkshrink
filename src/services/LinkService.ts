@@ -1,6 +1,8 @@
 'use strict'
 
 import { DynamoDBClient, GetItemCommand, GetItemCommandInput, GetItemCommandOutput, PutItemCommand, PutItemCommandInput, PutItemCommandOutput, UpdateItemCommand, UpdateItemCommandInput, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb'
+import LinkNotFoundError from '../errors/LinkNotFoundError'
+import logger from '../logging/Logger'
 import { Link } from '../models/Link'
 
 const KSUID = require('ksuid')
@@ -22,19 +24,25 @@ export default class LinkService {
             },
             TableName: process.env.LINKSTABLE
         }
-        let getItemResponse: GetItemCommandOutput = await this.ddbClient.send(new GetItemCommand(getItemInput))
 
-        if (getItemResponse.Item == undefined) {
-            throw new Error('Link not found')
+        let getItemResponse: GetItemCommandOutput
+        try {
+            getItemResponse = await this.ddbClient.send(new GetItemCommand(getItemInput))
+        } catch (error) {
+            throw error
+        }
+
+        if (getItemResponse.Item === undefined) {
+            throw new LinkNotFoundError(slug)
         }
 
         let link: Link = {
-            slug: getItemResponse.Item.slug.S,
-            link: getItemResponse.Item.link.S,
-            key: getItemResponse.Item.key.S,
-            clicks: getItemResponse.Item.clicks.BOOL,
-            expires: new Date(getItemResponse.Item.expires.S),
-            created: new Date(getItemResponse.Item.created.S)
+            slug: getItemResponse.Item.slug.S!,
+            link: getItemResponse.Item.link.S!,
+            key: getItemResponse.Item.key.S!,
+            clicks: getItemResponse.Item.clicks.BOOL!,
+            expires: new Date(getItemResponse.Item.expires.S!),
+            created: new Date(getItemResponse.Item.created.S!)
         }
 
         return link
@@ -77,8 +85,12 @@ export default class LinkService {
             },
             ConditionExpression: 'attribute_not_exists(PK)'
         }
-
-        let putItemResponse: PutItemCommandOutput = await this.ddbClient.send(new PutItemCommand(putItemInput))
+        let putItemResponse: PutItemCommandOutput
+        try {
+            putItemResponse = await this.ddbClient.send(new PutItemCommand(putItemInput))
+        } catch (error) {
+            throw error
+        }
 
         return createdLink
 

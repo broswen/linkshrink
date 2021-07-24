@@ -3,6 +3,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { KinesisClient, PutRecordCommand, PutRecordCommandInput } from '@aws-sdk/client-kinesis'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import LinkNotFoundError from '../errors/LinkNotFoundError'
 import logger from '../logging/Logger'
 import { Link } from '../models/Link'
 import LinkService from '../services/LinkService'
@@ -18,13 +19,15 @@ const kinesisClient: KinesisClient = new KinesisClient({})
 const linkService: LinkService = new LinkService(ddbClient)
 
 async function getLink(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-  logger.info(event)
   let link: Link
   try {
     link = await linkService.getLink(event.pathParameters.slug)
   } catch (error) {
     logger.error(error)
-    throw new createError(404)
+    if (error instanceof LinkNotFoundError) {
+      throw createError(404)
+    }
+    throw createError(500)
   }
 
   if (new Date() > link.expires) {
