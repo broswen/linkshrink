@@ -36,7 +36,7 @@ The full link will look like `https://test.com/1vVGu3wpWWRiUZhXWJT7tElmzNw`. Thi
 ```
 
 ### TODO List
-- [ ] use typed errors
+- [x] use typed errors
 - [x] create glue crawler
 - [x] create glue table/database
 - [ ] use athena to create monthly reports

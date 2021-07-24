@@ -16,7 +16,7 @@ const createError = require('http-errors')
 const ddbClient: DynamoDBClient = new DynamoDBClient({})
 const linkService: LinkService = new LinkService(ddbClient)
 
-async function createLink(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+async function createLink(event: any): Promise<APIGatewayProxyResult> {
   let key: string = event.requestContext.identity.apiKeyId
 
   const expires: Date = new Date(event.body.expires)

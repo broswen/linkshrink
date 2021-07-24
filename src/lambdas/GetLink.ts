@@ -18,7 +18,7 @@ const ddbClient: DynamoDBClient = new DynamoDBClient({})
 const kinesisClient: KinesisClient = new KinesisClient({})
 const linkService: LinkService = new LinkService(ddbClient)
 
-async function getLink(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+async function getLink(event: any): Promise<APIGatewayProxyResult> {
   let link: Link
   try {
     link = await linkService.getLink(event.pathParameters.slug)
