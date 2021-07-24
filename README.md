@@ -3,6 +3,8 @@
 
 ![diagram](./LinkShrink.png)
 
+### [Click here for API Documenation using Swagger](https://broswen.github.io/linkshrink/)
+
 ### Usage
 
 1. Send POST request to `test.com/shrink` with details to create a link. `clicks` defines if click events should be saved for analytics. `expires` defines when the link will return 404s and no longer redirect.
