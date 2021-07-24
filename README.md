@@ -42,3 +42,4 @@ The full link will look like `https://test.com/1vVGu3wpWWRiUZhXWJT7tElmzNw`. Thi
 - [x] create glue crawler
 - [x] create glue table/database
 - [ ] use athena to create monthly reports
+- [ ] allow custom slug
