@@ -1,8 +1,8 @@
 'use strict'
 
-import { DynamoDBClient, GetItemCommand, GetItemCommandInput, GetItemCommandOutput, PutItemCommand, PutItemCommandInput, PutItemCommandOutput, UpdateItemCommand, UpdateItemCommandInput, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb'
+import { DynamoDBClient, GetItemCommand, GetItemCommandInput, GetItemCommandOutput, PutItemCommand, PutItemCommandInput, PutItemCommandOutput } from '@aws-sdk/client-dynamodb'
+import LinkAlreadyExistsError from '../errors/LinkAlreadyExistsError'
 import LinkNotFoundError from '../errors/LinkNotFoundError'
-import logger from '../logging/Logger'
 import { Link } from '../models/Link'
 
 const KSUID = require('ksuid')
@@ -48,14 +48,16 @@ export default class LinkService {
         return link
     }
 
-    async createLink(key: string, link: string, clicks: boolean, expires: Date): Promise<Link> {
-        let slug: string = (await KSUID.random()).string;
+    async createLink(key: string, link: string, clicks: boolean, expires: Date, slug?: string): Promise<Link> {
+        if (slug === undefined) {
+            slug = (await KSUID.random()).string;
+        }
 
         let createdLink: Link = {
             link,
             key,
             clicks,
-            slug,
+            slug: slug!,
             expires,
             created: new Date()
         }
@@ -83,12 +85,15 @@ export default class LinkService {
                 }
 
             },
-            ConditionExpression: 'attribute_not_exists(PK)'
+            ConditionExpression: 'attribute_not_exists(slug)'
         }
         let putItemResponse: PutItemCommandOutput
         try {
             putItemResponse = await this.ddbClient.send(new PutItemCommand(putItemInput))
         } catch (error) {
+            if (error.name === 'ConditionalCheckFailedException') {
+                throw new LinkAlreadyExistsError(createdLink.slug)
+            }
             throw error
         }
 

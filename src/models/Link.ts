@@ -1,5 +1,5 @@
 
-class Link {
+interface Link {
     slug: string
     key: string
     link: string

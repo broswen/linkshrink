@@ -25,7 +25,6 @@ Resources:
                   - dynamodb:DeleteItem
                   - dynamodb:Query
                 Resource:
-                  - !GetAtt ReportsTable.Arn
                   - !GetAtt LinksTable.Arn
               - Effect: Allow
                 Action:

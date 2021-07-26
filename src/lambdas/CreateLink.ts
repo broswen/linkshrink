@@ -1,10 +1,12 @@
 'use strict'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { APIGatewayProxyResult } from 'aws-lambda'
+import { create } from 'domain'
+import LinkAlreadyExistsError from '../errors/LinkAlreadyExistsError'
 import logger from '../logging/Logger'
-import LinkService from '../services/LinkService'
 import { Link } from '../models/Link'
+import LinkService from '../services/LinkService'
 const middy = require('@middy/core')
 
 const validator = require('@middy/validator')
@@ -22,10 +24,17 @@ async function createLink(event: any): Promise<APIGatewayProxyResult> {
   const expires: Date = new Date(event.body.expires)
   let createdLink: Link
   try {
+    if (event.body.slug) {
+      createdLink = await linkService.createLink(key, event.body.link, event.body.clicks, expires, event.body.slug)
+    } else {
+      createdLink = await linkService.createLink(key, event.body.link, event.body.clicks, expires)
+    }
 
-    createdLink = await linkService.createLink(key, event.body.link, event.body.clicks, expires)
   } catch (error) {
     logger.error(error)
+    if (error instanceof LinkAlreadyExistsError) {
+      throw createError(400)
+    }
     throw createError(500)
   }
 
@@ -45,7 +54,8 @@ const schema = {
       properties: {
         link: { type: 'string' },
         expires: { type: 'string', format: 'date-time' },
-        clicks: { type: 'boolean' }
+        clicks: { type: 'boolean' },
+        slug: { type: 'string', minLength: 1 }
       },
       required: ['link', 'expires', 'clicks']
     },

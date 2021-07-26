@@ -103,6 +103,9 @@ definitions:
         type: "string"
         format: "date-time"
         required: true
+      slug:
+        type: "string"
+        required: false
   CreateLinkResponse:
     type: "object"
     properties:
