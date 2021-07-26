@@ -22,7 +22,6 @@ paths:
           description: "Slug of the link to return"
           required: true
           type: "string"
-          format: "ksuid"
       responses:
         "301":
           description: "Success, redirect to destination"

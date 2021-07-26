@@ -3,7 +3,7 @@
 
 ![diagram](./LinkShrink.png)
 
-### [Click here for API Documenation using Swagger](https://broswen.github.io/linkshrink/)
+### [Click here for API Documentation using Swagger](https://broswen.github.io/linkshrink/)
 
 ### Usage
 
@@ -13,7 +13,8 @@
 {
     "link": "https://youtube.com",
     "clicks": true,
-    "expires": "2021-07-22T20:55:00"
+    "expires": "2021-07-22T20:55:00",
+    // "slug": "custom slug is optional"
 }
 ```
 
@@ -42,4 +43,4 @@ The full link will look like `https://test.com/1vVGu3wpWWRiUZhXWJT7tElmzNw`. Thi
 - [x] create glue crawler
 - [x] create glue table/database
 - [ ] use athena to create monthly reports
-- [ ] allow custom slug
+- [x] allow custom slug
