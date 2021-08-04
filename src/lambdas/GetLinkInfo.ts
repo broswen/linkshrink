@@ -11,6 +11,7 @@ const middy = require('@middy/core')
 const validator = require('@middy/validator')
 const jsonBodyParser = require('@middy/http-json-body-parser')
 const httpErrorHandler = require('@middy/http-error-handler')
+const cors = require('@middy/http-cors')
 const createError = require('http-errors')
 
 const ddbClient: DynamoDBClient = new DynamoDBClient({})
@@ -53,5 +54,6 @@ const handler = middy(getLinkInfo)
   .use(jsonBodyParser())
   .use(validator({ inputSchema: schema }))
   .use(httpErrorHandler())
+  .use(cors())
 
 module.exports = { handler }

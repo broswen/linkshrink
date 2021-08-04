@@ -2,7 +2,6 @@
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { APIGatewayProxyResult } from 'aws-lambda'
-import { create } from 'domain'
 import LinkAlreadyExistsError from '../errors/LinkAlreadyExistsError'
 import logger from '../logging/Logger'
 import { Link } from '../models/Link'
@@ -12,6 +11,7 @@ const middy = require('@middy/core')
 const validator = require('@middy/validator')
 const jsonBodyParser = require('@middy/http-json-body-parser')
 const httpErrorHandler = require('@middy/http-error-handler')
+const cors = require('@middy/http-cors')
 const createError = require('http-errors')
 
 
@@ -67,5 +67,6 @@ const handler = middy(createLink)
   .use(jsonBodyParser())
   .use(validator({ inputSchema: schema }))
   .use(httpErrorHandler())
+  .use(cors())
 
 module.exports = { handler }

@@ -40,7 +40,9 @@ functions:
       - http:
           path: /link
           method: post
+          cors: true
           private: true
+
   GetLink:
     handler: src/lambdas/GetLink.handler
     role: !GetAtt RestApiRole.Arn
@@ -48,6 +50,8 @@ functions:
       - http:
           path: /{slug}
           method: get
+          cors: true
+
   GetLinkInfo:
     handler: src/lambdas/GetLinkInfo.handler
     role: !GetAtt RestApiRole.Arn
@@ -55,6 +59,7 @@ functions:
       - http:
           path: /link/{slug}
           method: get
+          cors: true
           private: true
 
   DeliveryStreamProcessor:
